@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+<body>
+
+<ui:composition template="./template.xhtml">
+    <ui:define name="title">
+        Tomar Signos Vitales
+    </ui:define>
+
+    <ui:define name="body">
+        <h:form id="frm">
+            <p:growl id="growl" showDetail="true" life="2500"/>
+
+            <p:panel id="basic" style="margin-left: 10%; margin-right: 10%;margin-top: 46px; border: none">
+
+                <p:fieldset>
+                    <h:panelGrid id="pgDatos" columns="6">
+
+
+                        <p:outputLabel for="txtCedulaEnf" value="Cedula:" style="font-weight:bold"/>
+                        <h:panelGrid columns="3">
+                            <p:inputText id="txtCedulaEnf" size="10"
+                                         value="#{fichaMedicaController.fichaMedica.paciente.cedula}"/>
+                            <p:commandButton id="btnBuscarEnfermero" icon="fa fa-search"
+                                             onclick="PF('Fichas').show();"/>
+                        </h:panelGrid>
+
+
+                    </h:panelGrid>
+                </p:fieldset>
+
+                <p:separator></p:separator>
+
+                <p:fieldset>
+                    <p:outputLabel for="dtFecha" value="Fecha :" style="font-weight:bold"/>
+                    <p:calendar id="dtFecha" size="25" value="#{fichaMedicaController.fichaMedica.fecha}"
+                                showOn="button"
+                                pattern="dd-MM-yyyy" mask="true"/>
+
+                    <br/>
+                    <br/>
+
+                    <p:outputLabel for="txtEnfermero" value="Medico:" style="font-weight:bold"/>
+                    <p:inputText id="txtEnfermero" size="50" readonly="true" required="true"
+                                 value="#{fichaMedicaController.fichaMedica.medico.apellidos} #{fichaMedicaController.fichaMedica.medico.nombres}"/>
+
+                    <h:panelGrid id="pgDatos1" columns="6">
+                        <p:outputLabel for="txtPaciente" value="Cedula:" style="font-weight:bold"/>
+                        <h:panelGrid columns="3">
+                            <p:inputText id="txtPaciente" size="15"
+                                         value="#{fichaMedicaController.fichaMedica.paciente.cedula}"/>
+                            <p:commandButton id="btnBuscPaciente" icon="fa fa-plus-square-o" update="frm:basic"
+                                             actionListener="#{detalleSignosVitalesController.consultaaBotonPaciente()}"/>
+                            <p:commandButton id="btnBuscarPaciente" icon="fa fa-search"
+                                             onclick="PF('Pacientes').show();"/>
+                        </h:panelGrid>
+
+                        <p:outputLabel for="txtNombres" value="Nombres:" style="font-weight:bold"/>
+                        <p:inputText id="txtNombres" size="70" readonly="true"
+                                     value="#{fichaMedicaController.fichaMedica.paciente.apellidos} #{fichaMedicaController.fichaMedica.paciente.nombres}"/>
+
+                        <p:outputLabel for="txtEdad" value="Edad:" style="font-weight:bold"/>
+                        <p:inputText id="txtEdad" size="5" readonly="true" value="#{fichaMedicaController.edad}"/>
+
+                    </h:panelGrid>
+                </p:fieldset>
+
+                <p:separator></p:separator>
+
+                <p:fieldset legend="Detalles">
+
+
+                    <p:dataTable id="Detalle" var="d" rows="5" value="#{fichaMedicaController.listarDetalle}"
+                                 paginator="true" paginatorPosition="bottom"
+                                 style="width: 700px;margin: auto;margin-top: 2%">
+
+                        <p:column headerText="Antecedente">
+                            <h:outputText value="#{d.antecedentes.abreviatura} #{d.observacion}"/>
+                        </p:column>
+
+                        <p:column headerText="Tipo Antecedente">
+                            <h:outputText value="#{d.antecedentes.tipoAntecedente.descripcion}"/>
+                        </p:column>
+
+                    </p:dataTable>
+                </p:fieldset>
+
+            </p:panel>
+
+            <!-- TABLA DE Enfermeros-->
+            <p:dialog id="idDialogo1" widgetVar="Fichas" header="Lista Fichas" resizable="false" modal="false"
+                      style=" margin-right: auto" onShow="#{fichaMedicaController.cargarCargos()}">
+
+                <p:dataTable id="listarEnfermeros" var="p" rows="10" value="#{fichaMedicaController.listarFichaMedicas}"
+                             paginator="true" paginatorPosition="bottom" style="width: 550px;margin: auto"
+                             selectionMode="single" selection="#{fichaMedicaController.seleccionar}"
+                             rowKey="#{p.idFichaMedica}">
+
+                    <p:ajax event="rowSelect" listener="#{fichaMedicaController.accionSeleccionarToma()}"
+                            update=":frm:basic, :frm:Detalle" oncomplete="PF('Fichas').hide();"/>
+
+                    <p:column headerText="Id" filterBy="#{p.idFichaMedica}" filterMatchMode="contains">
+                        <h:outputText value="#{p.idFichaMedica}"/>
+                    </p:column>
+
+                    <p:column headerText="Paciente" filterBy="#{p.paciente.apellidos}" filterMatchMode="contains">
+                        <h:outputText value="#{p.paciente.apellidos} #{p.paciente.nombres}"/>
+                    </p:column>
+
+                    <p:column headerText="Fecha" filterMatchMode="contains">
+                        <h:outputText value="#{p.fecha}">
+                            <f:convertDateTime pattern="MM/dd/yyyy"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+
+        </h:form>
+
+
+    </ui:define>
+
+
+</ui:composition>
+
+</body>
+</html>

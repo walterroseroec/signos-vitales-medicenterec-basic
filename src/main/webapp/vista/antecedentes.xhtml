@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+
+        <ui:composition template="./template.xhtml">
+
+            <ui:define name="title">
+                Antecedentes
+            </ui:define>
+
+            <ui:define name="body">
+                <h:form id="frm">
+                    <p:growl id="growl" showDetail="true" life="2500" />
+
+                    <p:panel id="basic" header="Registrar" style="margin-top: 46px;" >
+                        <h:panelGrid  columns="2" style="margin: 0 auto">
+                            <h:panelGrid id="pgDatos" columns="2" style="margin-left: 35%;">
+
+                                <p:outputLabel value="Tipo Antecedente" for="tipan" />
+                                <p:selectOneMenu id="tipan"  required="true" requiredMessage="Tipo Antecedente es obligatorio"
+                                                 value="#{antecedentesController.antecedente.tipoAntecedente}"
+                                                 converter="omnifaces.SelectItemsConverter">
+                                    <p:ajax listener="#{antecedentesController.onSelecciono()}" />
+                                    <f:selectItem itemLabel="--Seleccione Tipo--" noSelectionOption="true" />
+                                    <f:selectItems value="#{tipoAntecedentesController.listarTipoAntecedentes}" var="c"
+                                                   itemLabel="#{c.descripcion}" itemValue="#{c}" />
+                                </p:selectOneMenu>
+
+                                <p:outputLabel value="Nombre" for="nombre" />
+                                <p:inputText id="nombre" value="#{antecedentesController.antecedente.nombre}" required="true"
+                                             requiredMessage="Nombre Obligatorio"
+                                             maxlength="50">
+                                    <p:keyFilter regEx="/^[A-Za-z\s]+$/g" />
+                                </p:inputText>
+                                <p:outputLabel value="Abreviatura" for="abr" />
+                                <p:inputText id="abr" value="#{antecedentesController.antecedente.abreviatura}" required="true"
+                                             requiredMessage="Nombre Obligatorio"
+                                             maxlength="20">
+                                </p:inputText>
+                                <p:outputLabel value="Descripcion" for="descripcion" />
+                                <p:inputTextarea id="descripcion" value="#{antecedentesController.antecedente.descripcion}" required="true"
+                                                 requiredMessage="Descripcion Obligatoria"
+                                                 maxlength="50">
+                                </p:inputTextarea>
+
+                            </h:panelGrid>
+
+                            <p:dataTable id="listar" value="#{antecedentesController.listarAntecedentes}" var="item" rows="10" 
+                                         paginator="true" paginatorPosition="bottom"   style="margin-left: 15%; margin-right: 10%"
+                                         selectionMode="single" selection="#{antecedentesController.seleccionar}" rowKey="#{item.idAntecedente}">
+
+                                <p:ajax event="rowSelect" listener="#{antecedentesController.accionSeleccionar()}" 
+                                        update=":frm:basic" />
+
+                                <p:column headerText="Nombre" filterBy="#{item.nombre}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.nombre}"/>
+                                </p:column>
+                                <p:column headerText="Descripcion" filterBy="#{item.descripcion}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.descripcion}"/>
+                                </p:column>
+                                <p:column headerText="Abreviatura" filterMatchMode="contains">
+                                    <h:outputText value="#{item.abreviatura}" />
+                                </p:column>
+                                <p:column headerText="Tipo Antecedente" filterMatchMode="contains">
+                                    <h:outputText value="#{item.tipoAntecedente.descripcion}" />
+                                </p:column>
+                            </p:dataTable>
+                        </h:panelGrid>
+
+
+                        <div style="margin-top: 2%;font-size: 16px;text-align: center">
+                            <p:commandButton id="btnGuardar" value="Guardar"
+                                             icon="fa fa-floppy-o"
+                                             actionListener="#{antecedentesController.guardar()}" validateClient="true" 
+                                             style="width: 125px" update="frm,:frm:basic,:frm:listar"/>
+
+                            <p:commandButton id="btnNuevo" icon="fa fa-plus" value="Nuevo"
+                                             action="#{antecedentesController.nuevo()}"  update=":frm:basic"  resetValues="true">
+                            </p:commandButton>
+
+                            <p:commandButton id="btnRegresar" icon="fa fa-reply-all" style=" margin-bottom: 3%"
+                                             action="principal.xhtml?faces-redirect=true" value="Cerrar" immediate="true" >
+                            </p:commandButton>
+                        </div>
+
+
+
+                    </p:panel>
+                </h:form>   
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

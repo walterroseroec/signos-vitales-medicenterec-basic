@@ -1,0 +1,187 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<body>
+
+<ui:composition template="./template.xhtml">
+    <ui:define name="title">
+        Tomar Signos Vitales
+    </ui:define>
+
+    <ui:define name="body">
+        <h:form id="frm">
+            <p:growl id="growl" showDetail="true" life="2500"/>
+
+            <p:panel id="basic" style="margin-left: 10%; margin-right: 10%;margin-top: 46px; border: none">
+
+                <p:fieldset>
+                    <h:panelGrid id="pgDatos" columns="6">
+                        <p:outputLabel for="dtFecha" value="Fecha :" style="font-weight:bold"/>
+                        <p:calendar id="dtFecha" size="25" value="#{fichaMedicaController.fichaMedica.fecha}"
+                                    showOn="button"
+                                    pattern="dd-MM-yyyy" mask="true"/>
+
+                        <p:outputLabel for="txtCedulaMedi" value="Cedula:" style="font-weight:bold"/>
+                        <h:panelGrid columns="3">
+                            <p:inputText id="txtCedulaMedi" size="10"
+                                         value="#{fichaMedicaController.fichaMedica.medico.cedula}"/>
+                            <p:commandButton id="btnBuscarMedico" icon="fa fa-plus-square-o" update="frm:basic"
+                                             actionListener="#{fichaMedicaController.consultaaBotonMedico()}"/>
+                            <p:commandButton id="btnBuscarEnfermero" icon="fa fa-search"
+                                             onclick="PF('Medicos').show();"/>
+                        </h:panelGrid>
+
+                        <p:outputLabel for="txtMedico" value="Medico:" style="font-weight:bold"/>
+                        <p:inputText id="txtMedico" size="25" readonly="true"
+                                     value="#{fichaMedicaController.fichaMedica.medico.apellidos} #{fichaMedicaController.fichaMedica.medico.nombres}"/>
+                    </h:panelGrid>
+                </p:fieldset>
+
+                <p:separator></p:separator>
+
+                <p:fieldset>
+                    <h:panelGrid id="pgDatos1" columns="6">
+                        <p:outputLabel for="txtPaciente" value="Cedula:" style="font-weight:bold"/>
+                        <h:panelGrid columns="3">
+                            <p:inputText id="txtPaciente" size="15"
+                                         value="#{fichaMedicaController.fichaMedica.paciente.cedula}"/>
+                            <p:commandButton id="btnBuscPaciente" icon="fa fa-plus-square-o" update=":frm,frm:basic"
+                                             actionListener="#{fichaMedicaController.consultaaBotonPaciente()}"/>
+                            <p:commandButton id="btnBuscarPaciente" icon="fa fa-search"
+                                             onclick="PF('Pacientes').show();"/>
+                        </h:panelGrid>
+
+                        <p:outputLabel for="txtNombres" value="Nombres:" style="font-weight:bold"/>
+                        <p:inputText id="txtNombres" size="70" readonly="true"
+                                     value="#{fichaMedicaController.fichaMedica.paciente.apellidos} #{fichaMedicaController.fichaMedica.paciente.nombres}"/>
+
+                        <p:outputLabel for="txtEdad" value="Edad:" style="font-weight:bold"/>
+                        <p:inputText id="txtEdad" size="5" readonly="true" value="#{fichaMedicaController.edad}"/>
+
+                    </h:panelGrid>
+                </p:fieldset>
+
+                <p:separator></p:separator>
+
+            </p:panel>
+
+
+            <p:dialog id="idDialogo1" widgetVar="Medicos" header="Lista de Medicos" resizable="false" modal="false"
+                      style=" margin-right: auto" onShow="#{fichaMedicaController.cargarCargos()}">
+
+                <p:dataTable id="listarEnfermeros" var="p" rows="10" value="#{fichaMedicaController.listarMedicos}"
+                             paginator="true" paginatorPosition="bottom" style="width: 550px;margin: auto"
+                             selectionMode="single" selection="#{fichaMedicaController.seleccionarMedico}"
+                             rowKey="#{p.idMedico}">
+
+                    <p:ajax event="rowSelect" listener="#{fichaMedicaController.accionSeleccionarMedico()}"
+                            update=":frm:basic" oncomplete="PF('Medicos').hide();"/>
+
+
+                    <p:column headerText="Apellidos" filterBy="#{p.apellidos}" filterMatchMode="contains">
+                        <h:outputText value="#{p.apellidos}"/>
+                    </p:column>
+
+                    <p:column headerText="Nombres" filterBy="#{p.nombres}" filterMatchMode="contains">
+                        <h:outputText value="#{p.nombres}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+
+            <!-- TABLA DE PACIENTES-->
+            <p:dialog id="idDialogo2" widgetVar="Pacientes" header="Lista de Pacientes" resizable="false" modal="false"
+                      style=" margin-right: auto" onShow="#{fichaMedicaController.cargarCargos()}">
+
+                <p:dataTable id="listarPacientes" var="c" rows="10" value="#{fichaMedicaController.listarPaciente}"
+                             paginator="true" paginatorPosition="bottom" style="width: 550px;margin: auto"
+                             selectionMode="single" selection="#{fichaMedicaController.seleccionarPaciente}"
+                             rowKey="#{c.idPaciente}">
+
+                    <p:ajax event="rowSelect" listener="#{fichaMedicaController.accionSeleccionarPaciemte()}"
+                            update=":frm:basic" oncomplete="PF('Pacientes').hide();"/>
+
+                    <p:column headerText="Cedula" filterBy="#{c.cedula}" filterMatchMode="contains">
+                        <h:outputText value="#{c.cedula}"/>
+                    </p:column>
+
+                    <p:column headerText="Nombres" filterBy="#{c.nombres}" filterMatchMode="contains">
+                        <h:outputText value="#{c.nombres}"/>
+                    </p:column>
+
+                    <p:column headerText="Apellidos" filterBy="#{c.apellidos}" filterMatchMode="contains">
+                        <h:outputText value="#{c.apellidos}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+
+
+        </h:form>
+
+        <h:form id="dt" style="margin-left: 10%; margin-right: 10%; border: none">
+            <p:fieldset legend="Detalles">
+                <h:panelGrid id="pgDatos2" columns="6" cellpadding="5" style="margin-top: 2%;text-align: right">
+
+                    <p:outputLabel for="cmbEtapa" value="Antecedente: " style="font-weight:bold"/>
+                    <p:selectOneMenu id="cmbEtapa" style="width:200px"
+                                     required="true" requiredMessage="Seleccione un Signo"
+                                     value="#{fichaMedicaController.detalleFicha.antecedentes}"
+                                     converter="omnifaces.SelectItemsConverter">
+                        <p:ajax listener="#{fichaMedicaController.onSeleccionAnt()}"/>
+                        <f:selectItem itemLabel="-- Seleccione Antecedente --" noSelectionOption="true"/>
+                        <f:selectItems value="#{fichaMedicaController.listarAnt}" var="c"
+                                       itemLabel="#{c.nombre}" itemValue="#{c}"/>
+                    </p:selectOneMenu>
+
+                    <p:commandButton id="btnAgregar" icon="fa fa-plus" style="color: #333333"
+                                     actionListener="#{fichaMedicaController.accionAgregar()}" value="Agregar"
+                                     update=":dt,dt:Detalle">
+                        <p:tooltip id="toolTipFade5" for="btnAgregar" value="Agregar al detalle" position="top"/>
+                    </p:commandButton>
+                </h:panelGrid>
+
+                <p:dataTable id="Detalle" var="d" rows="5" value="#{fichaMedicaController.listarDetalle}"
+                             paginator="true" paginatorPosition="bottom"
+                             style="width: 700px;margin: auto;margin-top: 2%">
+
+
+                    <p:column headerText="Antecedente">
+                        <h:outputText value="#{d.antecedentes.abreviatura} #{d.observacion}"/>
+                    </p:column>
+
+                    <p:column headerText="Tipo Antecedente">
+                        <h:outputText value="#{d.antecedentes.tipoAntecedente.descripcion}"/>
+                    </p:column>
+
+                </p:dataTable>
+            </p:fieldset>
+        </h:form>
+
+        <h:form>
+            <div style="margin-top: 2%;font-size: 16px;text-align: center">
+                <p:commandButton id="btnGuardar" value="Guardar" icon="fa fa-floppy-o"
+                                 actionListener="#{fichaMedicaController.guardar()}" validateClient="true"
+                                 style="width: 125px" update="frm,:frm:basic, dt:Detalle"/>
+
+                <p:commandButton id="btnNuevo" icon="fa fa-plus" value="Nuevo"
+                                 action="#{fichaMedicaController.nuevo()}" update=":frm:basic" resetValues="true">
+                </p:commandButton>
+
+                <p:commandButton id="btnRegresar" icon="fa fa-reply-all" style=" margin-bottom: 3%"
+                                 action="principal.xhtml?faces-redirect=true" value="Cerrar" immediate="true">
+                </p:commandButton>
+            </div>
+
+        </h:form>
+    </ui:define>
+
+
+</ui:composition>
+
+</body>
+</html>

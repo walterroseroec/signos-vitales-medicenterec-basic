@@ -1,0 +1,128 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<body>
+
+<ui:composition template="./template.xhtml">
+
+    <ui:define name="title">
+        Enfermero
+    </ui:define>
+
+    <ui:define name="body">
+        <h:form id="frm">
+            <p:growl id="growl" showDetail="true" life="2500"/>
+            <p:panel id="basic" header="Registrar" style="margin-top: 46px;" >
+
+                <h:panelGrid columns="2" style="margin: 0 auto">
+                    <h:panelGrid id="pgDatos" columns="2" style="margin-left: 35%;">
+
+                        <p:outputLabel value="Cedula" for="cedula"/>
+                        <p:inputText id="cedula" value="#{enfermeroController.enfermero.cedula}" maxlength="10"
+                                     required="true"
+                                     requiredMessage="La cedula debe tener 10 Digitos">
+                            <p:keyFilter mask="num"/>
+                        </p:inputText>
+                        <p:outputLabel value="Nombres" for="nombres"/>
+                        <p:inputText id="nombres" value="#{enfermeroController.enfermero.nombres}" required="true"
+                                     requiredMessage="Nombre Obligatorio"
+                                     maxlength="50">
+                            <p:keyFilter regEx="/^[A-Za-z\s]+$/g"/>
+                        </p:inputText>
+                        <p:outputLabel value="Apellidos" for="apellidos"/>
+                        <p:inputText id="apellidos" value="#{enfermeroController.enfermero.apellidos}" required="true"
+                                     requiredMessage="Apellidos Obligatorio"
+                                     maxlength="50">
+                            <p:keyFilter regEx="/^[A-Za-z\s]+$/g"/>
+                        </p:inputText>
+                        <p:outputLabel value="Direccion" for="direccion"/>
+                        <p:inputTextarea id="direccion" value="#{enfermeroController.enfermero.direccion}"
+                                         required="true"
+                                         requiredMessage="Direccion Obligatoria" maxlength="120">
+                        </p:inputTextarea>
+                        <p:outputLabel value="Celular" for="celular"/>
+                        <p:inputText id="celular" value="#{enfermeroController.enfermero.celular}" maxlength="10"
+                                     required="true"
+                                     requiredMessage="Celular debe contar de 10 Digitos">
+                            <p:keyFilter mask="num"/>
+                        </p:inputText>
+                        <p:outputLabel value="Fecha Nac." for="fechaNacimiento"/>
+                        <p:calendar id="fechaNacimiento" pattern="MM/dd/yyyy" mask="true"
+                                    value="#{enfermeroController.enfermero.fechaNacimiento}"
+                                    required="true" size="15"
+                                    requiredMessage="Fecha Obligatoria"
+                                    showOn="button"/>
+                        <p:outputLabel value="Estado" for="estado"/>
+                        <p:selectBooleanCheckbox id="estado" value="#{enfermeroController.enfermero.estado}"/>
+                    </h:panelGrid>
+
+                    <p:dataTable id="listar" value="#{enfermeroController.listar}" var="item" rows="10"
+                                 paginator="true" paginatorPosition="bottom" style="margin-left: 15%; margin-right: 10%"
+                                 selectionMode="single" selection="#{enfermeroController.seleccionar}"
+                                 rowKey="#{item.idEnfermero}">
+
+                        <p:ajax event="rowSelect" listener="#{enfermeroController.accionSeleccionar()}"
+                                update=":frm:basic"/>
+
+                        <f:facet name="header">
+                            Lista de Enfermeros
+                        </f:facet>
+
+                        <p:column headerText="Cedula" filterBy="#{item.cedula}" filterMatchMode="contains">
+                            <h:outputText value="#{item.cedula}"/>
+                        </p:column>
+                        <p:column headerText="Nombres" filterBy="#{item.nombres}" filterMatchMode="contains">
+                            <h:outputText value="#{item.nombres}"/>
+                        </p:column>
+                        <p:column headerText="Apellidos" filterBy="#{item.apellidos}" filterMatchMode="contains">
+                            <h:outputText value="#{item.apellidos}"/>
+                        </p:column>
+                        <p:column headerText="Direccion" filterMatchMode="contains">
+                            <h:outputText value="#{item.direccion}"/>
+                        </p:column>
+                        <p:column headerText="Celular" filterMatchMode="contains">
+                            <h:outputText value="#{item.celular}"/>
+                        </p:column>
+                        <p:column headerText="Fech. Nac." filterMatchMode="contains">
+                            <h:outputText value="#{item.fechaNacimiento}">
+                                <f:convertDateTime pattern="MM/dd/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="estado" filterMatchMode="contains">
+                            <p:selectBooleanCheckbox value="#{item.estado}" disabled="true"/>
+                        </p:column>
+                    </p:dataTable>
+
+                </h:panelGrid>
+
+
+                <div style="margin-top: 2%;font-size: 16px;text-align: center">
+                    <p:commandButton id="btnGuardar" value="Guardar" icon="fa fa-floppy-o"
+                                     actionListener="#{enfermeroController.guardar()}" validateClient="true"
+                                     style="width: 125px" update="frm,:frm:basic,:frm:listar"/>
+
+                    <p:commandButton id="btnNuevo" icon="fa fa-plus" value="Nuevo"
+                                     action="#{enfermeroController.nuevo()}" update=":frm:basic" resetValues="true">
+                    </p:commandButton>
+
+                    <p:commandButton id="btnRegresar" icon="fa fa-reply-all" style=" margin-bottom: 3%"
+                                     action="main.xhtml?faces-redirect=true" value="Cerrar" immediate="true">
+                    </p:commandButton>
+                </div>
+
+
+            </p:panel>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>
+
+</body>
+</html>
